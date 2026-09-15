@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MBTI로 아르케아 파트너 찾기</title>
+<style>
+  :root {
+    --lav: #c7b3e6;      /* 상단 라벤더 */
+    --lav-deep: #9a84c9;
+    --cyan: #3fbcd8;     /* 중앙 시안 */
+    --cyan-soft: #a9e3ef;
+    --marble: #eef1f8;   /* 대리석 바닥 */
+    --line: #5b4b92;     /* 타일 경계선 보라 */
+    --void: #1b1631;     /* 상단 어두운 삼각형 */
+    --ink: #2b2452;
+    --ink-soft: #6c6394;
+  }
+  * { box-sizing: border-box; }
+  html { background: #dfe5f1; }
+  [hidden] { display: none !important; }
+  body {
+    margin: 0; padding: 0 16px 56px; min-height: 100vh;
+    font-family: "Segoe UI", "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    color: var(--ink); font-size: 18px; line-height: 1.65;
+    background:
+      radial-gradient(ellipse at 50% 58%, rgba(255,255,255,.75), transparent 45%),
+      linear-gradient(180deg, var(--lav) 0%, #b9c4ea 26%, var(--cyan) 46%, var(--cyan-soft) 58%, var(--marble) 72%, #dfe5f1 100%);
+    background-attachment: fixed;
+    position: relative; overflow-x: hidden;
+  }
+  /* 상단 역삼각형 공허 */
+  body::before {
+    content: ""; position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+    width: min(70vw, 680px); height: 19vh; z-index: 0; pointer-events: none;
+    background: linear-gradient(180deg, #0f0c20, var(--void) 60%, #3a2c5e);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    opacity: .92;
+  }
+  /* 바닥: 연한 대리석 결 */
+  body::after {
+    content: ""; position: fixed; left: 0; right: 0; bottom: 0; height: 42vh; z-index: 0; pointer-events: none;
+    background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%272000%27%20height%3D%27800%27%3E%3Cfilter%20id%3D%27m%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%27.0018%20.006%27%20numOctaves%3D%274%27%20stitchTiles%3D%27stitch%27%20seed%3D%277%27/%3E%3CfeColorMatrix%20values%3D%270%200%200%200%20.42%20%200%200%200%200%20.40%20%200%200%200%200%20.62%20%203%200%200%200%20-1.2%27/%3E%3CfeComponentTransfer%3E%3CfeFuncA%20type%3D%27table%27%20tableValues%3D%270%200%200%200%200%20.85%200%200%200%200%200%200%200%200%27/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20filter%3D%27url%28%23m%29%27/%3E%3C/svg%3E") center bottom / cover no-repeat;
+    opacity: .2;
+    -webkit-mask-image: linear-gradient(0deg, #000 35%, transparent);
+            mask-image: linear-gradient(0deg, #000 35%, transparent);
+  }
+  /* 버튼·카드 위의 반사광 */
+  .shine { position: relative; overflow: hidden; }
+  .shine::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .25s;
+    background: radial-gradient(circle 120px at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,.75), rgba(169,227,239,.25) 45%, transparent 70%);
+    mix-blend-mode: overlay;
+  }
+  .shine:hover::after { opacity: 1; }
+  .card-in.shine::after { background: radial-gradient(circle 220px at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,.7), rgba(169,227,239,.18) 45%, transparent 72%); mix-blend-mode: soft-light; }
+  @media (hover: none) { .shine::after { display: none; } }
+  .wrap { max-width: 760px; margin: 0 auto; position: relative; z-index: 1; padding-top: 23vh; }
+  .eyebrow { text-align: center; letter-spacing: .5em; font-size: .78rem; color: #fff;
+    margin: 0 0 6px; text-shadow: 0 0 12px rgba(63,188,216,.9); }
+  h1 { text-align: center; font-size: 2.1rem; font-weight: 300; letter-spacing: .08em;
+    margin: 0 0 6px; color: #fff; text-shadow: 0 2px 18px rgba(43,36,82,.55); }
+  .sub { text-align: center; color: var(--ink); margin: 0 0 28px; font-size: 1rem; }
+
+  /* 깨진 유리 조각 느낌의 버튼 */
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  @media (max-width: 480px) { .grid { grid-template-columns: repeat(2, 1fr); } h1 { font-size: 1.6rem; } }
+  .grid button {
+    font: inherit; font-size: 1.2rem; font-weight: 600; letter-spacing: .12em;
+    padding: 18px 0; border: 0; cursor: pointer; color: var(--ink);
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.9), rgba(238,241,248,.72) 55%, rgba(199,179,230,.55));
+    clip-path: polygon(8% 0, 100% 0, 100% 78%, 92% 100%, 0 100%, 0 22%);
+    box-shadow: inset 0 0 0 1.5px var(--line);
+    backdrop-filter: blur(6px);
+    transition: transform .15s, background .2s, color .2s;
+  }
+  .grid button:hover {
+    transform: translateY(-3px); color: #fff;
+    background: linear-gradient(135deg, var(--lav-deep), var(--cyan));
+  }
+
+  /* 결과 카드: 보라 선 테두리 + 대리석 안쪽 */
+  .card {
+    background: linear-gradient(135deg, var(--line), var(--cyan) 50%, var(--lav-deep));
+    padding: 2px;
+    clip-path: polygon(0 28px, 28px 0, 100% 0, 100% calc(100% - 28px), calc(100% - 28px) 100%, 0 100%);
+    filter: drop-shadow(0 10px 24px rgba(43,36,82,.3));
+  }
+  .card-in {
+    padding: 30px 24px; text-align: center;
+    clip-path: inherit;
+    background:
+      radial-gradient(circle at 80% 10%, rgba(169,227,239,.55), transparent 40%),
+      linear-gradient(160deg, #ffffff, var(--marble) 60%, #e3e0f2);
+  }
+  .type-tag { display: inline-block; color: #fff; font-weight: 600; letter-spacing: .25em;
+    padding: 4px 18px 4px 22px; background: linear-gradient(90deg, var(--void), var(--line));
+    clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%); }
+  .avatar { width: 160px; height: 160px; margin: 18px auto 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 92px; overflow: hidden;
+    background: linear-gradient(160deg, var(--lav), var(--cyan-soft));
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .name { font-size: 1.9rem; font-weight: 600; margin: 4px 0 0; color: var(--ink); letter-spacing: .05em; }
+  .en { color: var(--ink-soft); font-size: .95rem; letter-spacing: .3em; text-transform: uppercase; margin-bottom: 18px; }
+  ul.reasons { text-align: left; max-width: 520px; margin: 0 auto 20px; padding: 0; list-style: none; }
+  ul.reasons li { margin-bottom: 10px; padding-left: 22px; position: relative; }
+  ul.reasons li::before { content: "◆"; position: absolute; left: 0; color: var(--cyan); font-size: .8em; top: .2em; }
+  .match { max-width: 520px; margin: 0 auto 22px; padding: 14px;
+    background: rgba(199,179,230,.28); border-left: 3px solid var(--cyan); border-right: 3px solid var(--lav-deep); }
+  .match b { color: var(--line); letter-spacing: .1em; }
+  .retry { font: inherit; font-size: 1.1rem; font-weight: 600; letter-spacing: .1em;
+    padding: 12px 36px; border: 0; cursor: pointer; color: #fff;
+    background: linear-gradient(90deg, var(--void), var(--line) 50%, var(--cyan));
+    clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%); transition: filter .2s; }
+  .retry:hover { filter: brightness(1.2); }
+  .note { text-align: center; font-size: .85rem; color: var(--ink-soft); margin-top: 28px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">ARCAEA · PARTNER FINDER</p>
+  <h1>MBTI로 아르케아 파트너 찾기</h1>
+  <p class="sub">내 MBTI를 고르면 어울리는 메인 스토리 파트너를 알려줘요</p>
+
+  <div id="pick" class="grid"></div>
+
+  <div id="result" class="card" hidden><div class="card-in shine">
+    <span class="type-tag" id="rType"></span>
+    <div class="avatar" id="rAvatar"></div>
+    <div class="name" id="rName"></div>
+    <div class="en" id="rEn"></div>
+    <ul class="reasons" id="rReasons"></ul>
+    <div class="match" id="rMatch"></div>
+    <button class="retry" id="retry">다시 고르기</button>
+  </div></div>
+
+  <p class="note">메인 스토리 등장 인물 한정 · MBTI 매칭은 팬 해석이에요.<br>
+  캐릭터 이미지는 index.html 옆 <b>images</b> 폴더에 hikari.png 같은 이름으로 넣으면 이모지 대신 표시돼요.</p>
+</div>
+
+<script>
+// 캐릭터 정보 (img: images 폴더의 파일 이름)
+const CHARS = {
+  hikari:   { name: "히카리",   en: "Hikari",              emoji: "☀️", img: "hikari.png" },
+  tairitsu: { name: "타이리츠", en: "Tairitsu",            emoji: "🌑", img: "tairitsu.png" },
+  saya:     { name: "사야",     en: "Saya",                emoji: "🔍", img: "saya.png" },
+  vita:     { name: "비타",     en: "Vita",                emoji: "🧭", img: "vita.png" },
+  maya:     { name: "마야",     en: "Maya",                emoji: "🌷", img: "maya.png" },
+  insight:  { name: "혜안",     en: "Insight",             emoji: "👁️", img: "insight.png" },
+  nell:     { name: "연민",     en: "Nell / Compassion",   emoji: "🤍", img: "nell.png" }
+};
+
+// MBTI → 파트너 + 어울리는 이유 + 궁합 유형
+const TYPES = {
+  ENFP: { c: "hikari",   match: "INFJ", r: ["밝고 호기심 많은 에너지가 닮았어요", "좋은 기억과 희망을 소중히 여겨요", "주변을 자연스럽게 따뜻하게 만들어요"] },
+  ENFJ: { c: "hikari",   match: "INFP", r: ["다른 사람을 끌어안으려는 마음이 커요", "상처를 마주해도 결국 손을 내밀어요", "함께 나아가는 걸 중요하게 생각해요"] },
+  INTJ: { c: "tairitsu", match: "ENFP", r: ["혼자서도 흔들리지 않는 단단함이 있어요", "겉은 차갑지만 속은 깊어요", "스스로 정한 길을 끝까지 가요"] },
+  ISTP: { c: "tairitsu", match: "ESTJ", r: ["말보다 행동으로 보여줘요", "위기에서 침착하게 버텨내요", "혼자만의 공간이 필요해요"] },
+  ENTJ: { c: "tairitsu", match: "INTP", r: ["강한 의지로 상황을 정면 돌파해요", "고통스러운 진실도 피하지 않아요", "카리스마 있는 존재감이 있어요"] },
+  INTP: { c: "saya",     match: "ENTJ", r: ["궁금한 건 끝까지 파고들어요", "감정보다 관찰과 분석이 먼저예요", "세계의 원리에 관심이 많아요"] },
+  ENTP: { c: "saya",     match: "INFJ", r: ["새로운 가설을 세우는 걸 즐겨요", "질문을 멈추지 않는 탐구자예요", "예상 밖의 시선으로 문제를 봐요"] },
+  ISFP: { c: "vita",     match: "ESFJ", r: ["정해진 틀보다 자유로운 여정이 좋아요", "조용하지만 자기만의 감성이 뚜렷해요", "순간순간을 소중히 느껴요"] },
+  ESTP: { c: "vita",     match: "ISFJ", r: ["발길 닿는 대로 떠나는 모험가예요", "낯선 곳에서도 금방 적응해요", "직접 부딪혀보며 배워요"] },
+  ESFP: { c: "maya",     match: "ISTJ", r: ["분위기를 밝히는 존재감이 있어요", "감정을 솔직하게 표현해요", "사람들과 함께할 때 빛나요"] },
+  ESTJ: { c: "maya",     match: "ISTP", r: ["해야 할 일은 분명하게 해내요", "자기 역할에 책임감이 강해요", "주변을 이끄는 추진력이 있어요"] },
+  INFJ: { c: "insight",  match: "ENFP", r: ["앞일을 내다보는 깊은 통찰력이 있어요", "말수는 적어도 속은 누구보다 깊어요", "보이지 않는 흐름을 읽어내요"] },
+  ISTJ: { c: "insight",  match: "ESFP", r: ["차분하고 흔들림 없이 지켜봐요", "감정보다 사실을 먼저 살펴요", "맡은 자리를 묵묵히 지켜요"] },
+  ISFJ: { c: "nell",     match: "ESTP", r: ["다른 사람의 아픔에 먼저 마음이 가요", "조용히 곁을 지켜주는 타입이에요", "배려가 몸에 배어 있어요"] },
+  ESFJ: { c: "nell",     match: "ISFP", r: ["누군가를 돌보는 데서 힘을 얻어요", "공감 능력이 뛰어나요", "모두가 편안하길 바라요"] },
+  INFP: { c: "nell",     match: "ENFJ", r: ["여린 마음으로 타인을 이해하려 해요", "자신만의 따뜻한 가치관이 있어요", "상처 입은 존재를 외면하지 못해요"] }
+};
+
+const ORDER = ["INTJ","INTP","ENTJ","ENTP","INFJ","INFP","ENFJ","ENFP",
+               "ISTJ","ISFJ","ESTJ","ESFJ","ISTP","ISFP","ESTP","ESFP"];
+
+const pick = document.getElementById("pick");
+const result = document.getElementById("result");
+
+ORDER.forEach(t => {
+  const b = document.createElement("button");
+  b.textContent = t;
+  b.className = "shine";
+  b.onclick = () => show(t);
+  pick.appendChild(b);
+});
+
+function avatarHTML(ch) {
+  return `<img src="images/${ch.img}" alt="${ch.name}" onerror="this.replaceWith(document.createTextNode('${ch.emoji}'))">`;
+}
+
+function show(t) {
+  const d = TYPES[t], ch = CHARS[d.c];
+  const m = TYPES[d.match], mc = CHARS[m.c];
+  document.getElementById("rType").textContent = t;
+  document.getElementById("rAvatar").innerHTML = avatarHTML(ch);
+  document.getElementById("rName").textContent = ch.name;
+  document.getElementById("rEn").textContent = ch.en;
+  document.getElementById("rReasons").innerHTML = d.r.map(x => `<li>${x}</li>`).join("");
+  document.getElementById("rMatch").innerHTML =
+    `잘 맞는 유형: <b>${d.match}</b> — ${mc.emoji} ${mc.name}`;
+  pick.hidden = true;
+  result.hidden = false;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// 버튼·카드 반사광
+document.addEventListener("pointermove", e => {
+  const el = e.target.closest(".shine");
+  if (el) {
+    const r = el.getBoundingClientRect();
+    el.style.setProperty("--mx", (e.clientX - r.left) + "px");
+    el.style.setProperty("--my", (e.clientY - r.top) + "px");
+  }
+});
+
+document.getElementById("retry").onclick = () => {
+  result.hidden = true;
+  pick.hidden = false;
+};
+</script>
+</body>
+</html>
