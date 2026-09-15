@@ -6,61 +6,72 @@
 <title>MBTI로 아르케아 파트너 찾기</title>
 <style>
   :root {
-    --lav: #c7b3e6;      /* 상단 라벤더 */
-    --lav-deep: #9a84c9;
-    --cyan: #3fbcd8;     /* 중앙 시안 */
-    --cyan-soft: #a9e3ef;
-    --marble: #eef1f8;   /* 대리석 바닥 */
-    --line: #5b4b92;     /* 타일 경계선 보라 */
-    --void: #1b1631;     /* 상단 어두운 삼각형 */
-    --ink: #2b2452;
-    --ink-soft: #6c6394;
+    --lav: #cfd8e3;      /* 옅은 스틸 */
+    --lav-deep: #7d8ea5; /* 스틸 블루 */
+    --cyan: #e6c36a;     /* 금빛 링 */
+    --cyan-soft: #f6e8c2;
+    --marble: #e8edf3;   /* 구름빛 */
+    --line: #3b475c;     /* 짙은 청회색 선 */
+    --void: #121826;     /* 링 안쪽 어둠 */
+    --ink: #1e2737;
+    --ink-soft: #56657b;
   }
   * { box-sizing: border-box; }
-  html { background: #dfe5f1; }
+  html { background: #2b3546; }
   [hidden] { display: none !important; }
   body {
     margin: 0; padding: 0 16px 56px; min-height: 100vh;
     font-family: "Segoe UI", "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
     color: var(--ink); font-size: 18px; line-height: 1.65;
     background:
-      radial-gradient(ellipse at 50% 58%, rgba(255,255,255,.75), transparent 45%),
-      linear-gradient(180deg, var(--lav) 0%, #b9c4ea 26%, var(--cyan) 46%, var(--cyan-soft) 58%, var(--marble) 72%, #dfe5f1 100%);
+      radial-gradient(ellipse 55% 38% at 50% 64%, rgba(245,248,252,.8), rgba(200,212,226,.45) 45%, transparent 80%),
+      linear-gradient(180deg, #151c2a 0%, #2f3b4e 28%, #56667c 46%, #8795a8 62%, #c9d1dc 78%, #eef1f5 92%);
     background-attachment: fixed;
     position: relative; overflow-x: hidden;
   }
-  /* 상단 역삼각형 공허 */
-  body::before {
-    content: ""; position: fixed; top: 0; left: 50%; transform: translateX(-50%);
-    width: min(70vw, 680px); height: 19vh; z-index: 0; pointer-events: none;
-    background: linear-gradient(180deg, #0f0c20, var(--void) 60%, #3a2c5e);
-    clip-path: polygon(0 0, 100% 0, 50% 100%);
-    opacity: .92;
+  /* 배경 레이어 공통 */
+  .bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  /* 링 중심에서 퍼지는 빛줄기 */
+  .bg-rays {
+    background: repeating-conic-gradient(from 90deg at 50% calc(min(135vw, 125vh) * .143),
+      rgba(255,255,255,0) 0deg 5deg, rgba(255,248,225,.16) 5.6deg, rgba(255,255,255,0) 6.4deg 11deg);
+    -webkit-mask-image: radial-gradient(circle at 50% calc(min(135vw, 125vh) * .143), transparent 42%, #000 58%, transparent 95%);
+            mask-image: radial-gradient(circle at 50% calc(min(135vw, 125vh) * .143), transparent 42%, #000 58%, transparent 95%);
   }
-  /* 바닥: 연한 대리석 결 */
+  .bg-ring { --rw: min(135vw, 125vh); overflow: hidden; }
+  .bg-ring svg {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: var(--rw); height: auto; display: block; overflow: visible;
+    /* 링 아래쪽이 배경으로 자연스럽게 녹아들게 */
+    -webkit-mask-image: linear-gradient(180deg, #000 38%, rgba(0,0,0,.55) 62%, transparent 92%);
+            mask-image: linear-gradient(180deg, #000 38%, rgba(0,0,0,.55) 62%, transparent 92%);
+  }
+  /* 하단 흰 대리석 (결은 아주 뜸하고 연하게) */
   body::after {
-    content: ""; position: fixed; left: 0; right: 0; bottom: 0; height: 42vh; z-index: 0; pointer-events: none;
-    background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%272000%27%20height%3D%27800%27%3E%3Cfilter%20id%3D%27m%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%27.0018%20.006%27%20numOctaves%3D%274%27%20stitchTiles%3D%27stitch%27%20seed%3D%277%27/%3E%3CfeColorMatrix%20values%3D%270%200%200%200%20.42%20%200%200%200%200%20.40%20%200%200%200%200%20.62%20%203%200%200%200%20-1.2%27/%3E%3CfeComponentTransfer%3E%3CfeFuncA%20type%3D%27table%27%20tableValues%3D%270%200%200%200%200%20.85%200%200%200%200%200%200%200%200%27/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20filter%3D%27url%28%23m%29%27/%3E%3C/svg%3E") center bottom / cover no-repeat;
-    opacity: .2;
-    -webkit-mask-image: linear-gradient(0deg, #000 35%, transparent);
-            mask-image: linear-gradient(0deg, #000 35%, transparent);
+    content: ""; position: fixed; left: 0; right: 0; bottom: 0; height: 55vh; z-index: 0; pointer-events: none;
+    background:
+      url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%272000%27%20height%3D%27800%27%3E%3Cfilter%20id%3D%27m%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%27.0009%20.003%27%20numOctaves%3D%274%27%20seed%3D%2711%27/%3E%3CfeColorMatrix%20values%3D%270%200%200%200%20.55%20%200%200%200%200%20.58%20%200%200%200%200%20.66%20%203%200%200%200%20-1.2%27/%3E%3CfeComponentTransfer%3E%3CfeFuncA%20type%3D%27table%27%20tableValues%3D%270%200%200%200%200%200%200%200%200%200%200%20.22%200%200%200%200%200%200%200%200%200%200%200%200%200%27/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20filter%3D%27url%28%23m%29%27/%3E%3C/svg%3E") center bottom / cover no-repeat,
+      radial-gradient(ellipse 70% 60% at 50% 100%, #ffffff, rgba(255,255,255,0) 80%),
+      linear-gradient(180deg, rgba(240,243,247,0), #eef1f5 45%, #f7f8fa);
+    -webkit-mask-image: linear-gradient(0deg, #000 35%, rgba(0,0,0,.4) 70%, transparent);
+            mask-image: linear-gradient(0deg, #000 35%, rgba(0,0,0,.4) 70%, transparent);
   }
   /* 버튼·카드 위의 반사광 */
   .shine { position: relative; overflow: hidden; }
   .shine::after {
     content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .25s;
-    background: radial-gradient(circle 120px at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,.75), rgba(169,227,239,.25) 45%, transparent 70%);
+    background: radial-gradient(circle 120px at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,.75), rgba(246,232,194,.25) 45%, transparent 70%);
     mix-blend-mode: overlay;
   }
   .shine:hover::after { opacity: 1; }
-  .card-in.shine::after { background: radial-gradient(circle 220px at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,.7), rgba(169,227,239,.18) 45%, transparent 72%); mix-blend-mode: soft-light; }
+  .card-in.shine::after { background: radial-gradient(circle 220px at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,.7), rgba(246,232,194,.18) 45%, transparent 72%); mix-blend-mode: soft-light; }
   @media (hover: none) { .shine::after { display: none; } }
-  .wrap { max-width: 760px; margin: 0 auto; position: relative; z-index: 1; padding-top: 23vh; }
+  .wrap { max-width: 760px; margin: 0 auto; position: relative; z-index: 1; padding-top: calc(min(135vw, 125vh) * .34 + 12px); }
   .eyebrow { text-align: center; letter-spacing: .5em; font-size: .78rem; color: #fff;
-    margin: 0 0 6px; text-shadow: 0 0 12px rgba(63,188,216,.9); }
-  h1 { text-align: center; font-size: 2.1rem; font-weight: 300; letter-spacing: .08em;
+    margin: 0 0 6px; text-shadow: 0 0 12px rgba(230,195,106,.95); }
+  h1 { text-align: center; word-break: keep-all; font-size: 2.1rem; font-weight: 300; letter-spacing: .08em;
     margin: 0 0 6px; color: #fff; text-shadow: 0 2px 18px rgba(43,36,82,.55); }
-  .sub { text-align: center; color: var(--ink); margin: 0 0 28px; font-size: 1rem; }
+  .sub { text-align: center; word-break: keep-all; color: #eef2f7; text-shadow: 0 1px 8px rgba(18,24,38,.7); margin: 0 0 28px; font-size: 1rem; }
 
   /* 깨진 유리 조각 느낌의 버튼 */
   .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
@@ -69,7 +80,7 @@
     font: inherit; font-size: 1.2rem; font-weight: 600; letter-spacing: .12em;
     padding: 18px 0; border: 0; cursor: pointer; color: var(--ink);
     background:
-      linear-gradient(135deg, rgba(255,255,255,.9), rgba(238,241,248,.72) 55%, rgba(199,179,230,.55));
+      linear-gradient(135deg, rgba(255,255,255,.9), rgba(238,241,248,.72) 55%, rgba(207,216,227,.6));
     clip-path: polygon(8% 0, 100% 0, 100% 78%, 92% 100%, 0 100%, 0 22%);
     box-shadow: inset 0 0 0 1.5px var(--line);
     backdrop-filter: blur(6px);
@@ -91,7 +102,7 @@
     padding: 30px 24px; text-align: center;
     clip-path: inherit;
     background:
-      radial-gradient(circle at 80% 10%, rgba(169,227,239,.55), transparent 40%),
+      radial-gradient(circle at 80% 10%, rgba(246,232,194,.55), transparent 40%),
       linear-gradient(160deg, #ffffff, var(--marble) 60%, #e3e0f2);
   }
   .type-tag { display: inline-block; color: #fff; font-weight: 600; letter-spacing: .25em;
@@ -108,7 +119,7 @@
   ul.reasons li { margin-bottom: 10px; padding-left: 22px; position: relative; }
   ul.reasons li::before { content: "◆"; position: absolute; left: 0; color: var(--cyan); font-size: .8em; top: .2em; }
   .match { max-width: 520px; margin: 0 auto 22px; padding: 14px;
-    background: rgba(199,179,230,.28); border-left: 3px solid var(--cyan); border-right: 3px solid var(--lav-deep); }
+    background: rgba(125,142,165,.16); border-left: 3px solid var(--cyan); border-right: 3px solid var(--lav-deep); }
   .match b { color: var(--line); letter-spacing: .1em; }
   .retry { font: inherit; font-size: 1.1rem; font-weight: 600; letter-spacing: .1em;
     padding: 12px 36px; border: 0; cursor: pointer; color: #fff;
@@ -119,6 +130,38 @@
 </style>
 </head>
 <body>
+<div class="bg bg-rays"></div>
+<div class="bg bg-ring">
+  <svg viewBox="0 -20 1000 420" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
+    <defs>
+      <filter id="gl" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <radialGradient id="inner" cx="50%" cy="30%" r="70%">
+        <stop offset="0" stop-color="#0c111c"/><stop offset=".6" stop-color="#1b2433"/><stop offset="1" stop-color="#4a5a70"/>
+      </radialGradient>
+    </defs>
+    <circle cx="500" cy="40" r="300" fill="url(#inner)" opacity=".95"/>
+    <!-- 어두운 띠 + 눈금 -->
+    <circle cx="500" cy="40" r="322" fill="none" stroke="#1a2230" stroke-width="30"/>
+    <circle cx="500" cy="40" r="322" fill="none" stroke="#dfe7f1" stroke-width="30" stroke-dasharray="2 38" opacity=".55"/>
+    <!-- 금빛 테 -->
+    <circle cx="500" cy="40" r="304" fill="none" stroke="#f3dc98" stroke-width="3" filter="url(#gl)"/>
+    <circle cx="500" cy="40" r="340" fill="none" stroke="#e6c36a" stroke-width="5" filter="url(#gl)"/>
+    <circle cx="500" cy="40" r="350" fill="none" stroke="#fff4d2" stroke-width="1.2" opacity=".7"/>
+    <!-- 테두리 장식 (다이아몬드) -->
+    <g fill="#9fb1c6" stroke="#f3dc98" stroke-width="1.5">
+      <path d="M500 350 l10 12 -10 12 -10 -12z"/>
+      <path d="M270 263 l10 12 -10 12 -10 -12z"/>
+      <path d="M730 263 l10 12 -10 12 -10 -12z"/>
+      <path d="M170 90 l10 12 -10 12 -10 -12z"/>
+      <path d="M830 90 l10 12 -10 12 -10 -12z"/>
+    </g>
+    <!-- 빛나는 역삼각형 -->
+    <path d="M250 -20 L500 250 L750 -20" fill="none" stroke="#fff1c4" stroke-width="3" filter="url(#gl)"/>
+  </svg>
+</div>
 <div class="wrap">
   <p class="eyebrow">ARCAEA · PARTNER FINDER</p>
   <h1>MBTI로 아르케아 파트너 찾기</h1>
